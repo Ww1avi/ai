@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avi's - AI Programming Assistant</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366f1',
+secondary:'#8b5cf6'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+background-color: #f9fafb;
+}
+.code-editor {
+font-family: 'JetBrains Mono', monospace;
+}
+.typing-animation::after {
+content: '|';
+animation: blink 1s infinite;
+}
+@keyframes blink {
+0%, 100% { opacity: 1; }
+50% { opacity: 0; }
+}
+.scrollbar-thin::-webkit-scrollbar {
+width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+background: #f1f1f1;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+background: #d1d5db;
+border-radius: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+background: #9ca3af;
+}
+input[type="range"] {
+-webkit-appearance: none;
+height: 6px;
+background: #e5e7eb;
+border-radius: 8px;
+outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+width: 16px;
+height: 16px;
+background: #6366f1;
+border-radius: 50%;
+cursor: pointer;
+}
+.switch {
+position: relative;
+display: inline-block;
+width: 44px;
+height: 24px;
+}
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #e5e7eb;
+transition: .4s;
+border-radius: 24px;
+}
+.slider:before {
+position: absolute;
+content: "";
+height: 18px;
+width: 18px;
+left: 3px;
+bottom: 3px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .slider {
+background-color: #6366f1;
+}
+input:checked + .slider:before {
+transform: translateX(20px);
+}
+.custom-checkbox {
+display: flex;
+align-items: center;
+position: relative;
+cursor: pointer;
+user-select: none;
+}
+.custom-checkbox input {
+position: absolute;
+opacity: 0;
+cursor: pointer;
+height: 0;
+width: 0;
+}
+.checkmark {
+height: 18px;
+width: 18px;
+background-color: #fff;
+border: 2px solid #d1d5db;
+border-radius: 4px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.custom-checkbox input:checked ~ .checkmark {
+background-color: #6366f1;
+border-color: #6366f1;
+}
+.checkmark:after {
+content: "";
+display: none;
+width: 5px;
+height: 10px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+.custom-checkbox input:checked ~ .checkmark:after {
+display: block;
+}
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="bg-white border-b border-gray-200">
+<div class="container mx-auto px-4 py-3 flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-10 h-10 flex items-center justify-center bg-gradient-to-r from-primary to-secondary rounded-full text-white">
+<i class="ri-code-line ri-lg"></i>
+</div>
+<h1 class="text-2xl font-['Pacifico'] text-gray-800">Avi's</h1>
+</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a href="#" class="text-primary font-medium">Home</a>
+<a href="#" class="text-gray-600 hover:text-primary transition-colors">Features</a>
+<a href="#" class="text-gray-600 hover:text-primary transition-colors">Documentation</a>
+<a href="#" class="text-gray-600 hover:text-primary transition-colors">Pricing</a>
+</nav>
+<div class="flex items-center space-x-4">
+<div class="hidden md:flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+<span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+Connected to Avi's
+</div>
+<div class="relative">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors !rounded-button cursor-pointer">
+<i class="ri-user-line ri-lg text-gray-700"></i>
+</button>
+</div>
+<button id="mobile-menu-toggle" class="md:hidden w-10 h-10 flex items-center justify-center !rounded-button cursor-pointer">
+<i class="ri-menu-line ri-lg text-gray-700"></i>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Language Selection Panel -->
+<aside id="language-sidebar" class="w-64 bg-white border-r border-gray-200 flex flex-col h-full hidden md:block">
+<div class="p-4 border-b border-gray-200">
+<div class="relative">
+<input type="text" placeholder="Search languages..." class="w-full pl-9 pr-4 py-2 bg-gray-50 border-none rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+<div class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-search-line"></i>
+</div>
+</div>
+</div>
+<div class="p-4 border-b border-gray-200">
+<h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Pinned</h3>
+<div class="space-y-2">
+<button class="language-btn w-full flex items-center px-3 py-2 bg-primary/10 text-primary rounded !rounded-button whitespace-nowrap cursor-pointer" data-language="JavaScript">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-javascript-line"></i>
+</div>
+<span>JavaScript</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="Python">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-python-line"></i>
+</div>
+<span>Python</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="React">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-reactjs-line"></i>
+</div>
+<span>React</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto scrollbar-thin p-4">
+<h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Scripting</h3>
+<div class="space-y-1 mb-6">
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="Lua">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-code-s-slash-line"></i>
+</div>
+<span>Lua</span>
+</button>
+</div>
+<h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">All Languages</h3>
+<div class="space-y-1">
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="HTML/CSS">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-html5-line"></i>
+</div>
+<span>HTML/CSS</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="C++">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-terminal-box-line"></i>
+</div>
+<span>C++</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="Java">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-code-s-slash-line"></i>
+</div>
+<span>Java</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="SQL">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-database-2-line"></i>
+</div>
+<span>SQL</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="TypeScript">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-code-box-line"></i>
+</div>
+<span>TypeScript</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="Flutter/Dart">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-flutter-line"></i>
+</div>
+<span>Flutter/Dart</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="PHP">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-code-line"></i>
+</div>
+<span>PHP</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="Ruby">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-braces-line"></i>
+</div>
+<span>Ruby</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="Swift">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-code-s-line"></i>
+</div>
+<span>Swift</span>
+</button>
+<button class="language-btn w-full flex items-center px-3 py-2 hover:bg-gray-100 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-language="Kotlin">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-android-line"></i>
+</div>
+<span>Kotlin</span>
+</button>
+</div>
+</div>
+<div class="p-4 border-t border-gray-200">
+<button class="w-full flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 !rounded-button whitespace-nowrap cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center mr-2">
+<i class="ri-settings-3-line"></i>
+</div>
+<span>Language Settings</span>
+</button>
+</div>
+</aside>
+<!-- Main Chat Area -->
+<div class="flex-1 flex flex-col h-full overflow-hidden">
+<!-- Chat Controls -->
+<div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+<div class="flex items-center">
+<button id="sidebar-toggle" class="md:hidden w-10 h-10 mr-3 flex items-center justify-center rounded hover:bg-gray-100 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-menu-line ri-lg"></i>
+</button>
+<h2 id="chat-title" class="text-lg font-semibold text-gray-800">New Chat</h2>
+</div>
+<div class="flex items-center space-x-2">
+<div class="flex items-center bg-gray-100 rounded-full px-1 py-1">
+<button class="px-3 py-1 bg-white shadow-sm rounded-full text-sm font-medium !rounded-full whitespace-nowrap cursor-pointer">Light</button>
+<button class="px-3 py-1 text-gray-600 rounded-full text-sm font-medium !rounded-full whitespace-nowrap cursor-pointer">Dark</button>
+</div>
+<div class="flex space-x-1">
+<button class="w-9 h-9 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-save-line ri-lg"></i>
+</button>
+<button class="w-9 h-9 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-download-line ri-lg"></i>
+</button>
+<button id="clear-chat" class="w-9 h-9 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-delete-bin-line ri-lg"></i>
+</button>
+</div>
+</div>
+</div>
+<!-- Chat Messages -->
+<div id="chat-messages" class="flex-1 overflow-y-auto scrollbar-thin p-4 bg-white">
+<!-- Welcome Message -->
+<div class="max-w-3xl mx-auto mb-8">
+<div class="flex items-center justify-center mb-6">
+<div class="w-16 h-16 flex items-center justify-center bg-gradient-to-r from-primary to-secondary rounded-full text-white">
+<i class="ri-code-line ri-2x"></i>
+</div>
+</div>
+<h1 class="text-center text-3xl font-bold text-gray-800 mb-3">Welcome to Avi's</h1>
+<p class="text-center text-gray-600 mb-6">Your AI programming assistant for every language</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<div class="bg-gray-50 p-4 rounded border border-gray-200">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full mb-3">
+<i class="ri-code-box-line ri-lg"></i>
+</div>
+<h3 class="font-medium text-gray-800 mb-1">Code Completion</h3>
+<p class="text-sm text-gray-600">Get intelligent code suggestions as you type</p>
+</div>
+<div class="bg-gray-50 p-4 rounded border border-gray-200">
+<div class="w-10 h-10 flex items-center justify-center bg-green-100 text-green-600 rounded-full mb-3">
+<i class="ri-bug-line ri-lg"></i>
+</div>
+<h3 class="font-medium text-gray-800 mb-1">Debug Assistance</h3>
+<p class="text-sm text-gray-600">Find and fix bugs in your code quickly</p>
+</div>
+<div class="bg-gray-50 p-4 rounded border border-gray-200">
+<div class="w-10 h-10 flex items-center justify-center bg-purple-100 text-purple-600 rounded-full mb-3">
+<i class="ri-translate-2 ri-lg"></i>
+</div>
+<h3 class="font-medium text-gray-800 mb-1">Language Translation</h3>
+<p class="text-sm text-gray-600">Convert code between programming languages</p>
+</div>
+</div>
+</div>
+<!-- Sample Conversation -->
+<div id="conversation" class="max-w-3xl mx-auto space-y-6">
+<!-- User Message -->
+<div class="flex items-start">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-4 flex-shrink-0">
+<i class="ri-user-line text-gray-600"></i>
+</div>
+<div class="flex-1">
+<div class="bg-gray-100 rounded-lg p-4">
+<p class="text-gray-800">How do I create a responsive navbar with JavaScript and CSS?</p>
+</div>
+<div class="mt-1 text-xs text-gray-500">Today, 10:24 AM</div>
+</div>
+</div>
+<!-- AI Response -->
+<div class="flex items-start">
+<div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-4 flex-shrink-0 text-white">
+<i class="ri-code-s-slash-line"></i>
+</div>
+<div class="flex-1">
+<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+<p class="text-gray-800 mb-4">I'll show you how to create a responsive navbar with JavaScript and CSS. Here's a complete example:</p>
+<!-- Code Block -->
+<div class="mb-4">
+<div class="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t text-sm">
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-html5-line"></i>
+</div>
+<span>HTML</span>
+</div>
+<div class="flex items-center space-x-2">
+<button class="copy-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-code-type="html">
+<i class="ri-clipboard-line text-gray-400"></i>
+</button>
+</div>
+</div>
+<div class="bg-gray-900 p-4 rounded-b overflow-x-auto">
+<pre class="text-gray-300 text-sm font-mono"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+&lt;title&gt;Responsive Navbar&lt;/title&gt;
+&lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;nav class="navbar"&gt;
+&lt;div class="logo"&gt;Brand Logo&lt;/div&gt;
+&lt;ul class="nav-links"&gt;
+&lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#"&gt;About&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#"&gt;Services&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#"&gt;Contact&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="burger"&gt;
+&lt;div class="line1"&gt;&lt;/div&gt;
+&lt;div class="line2"&gt;&lt;/div&gt;
+&lt;div class="line3"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/nav&gt;
+&lt;script src="script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t text-sm">
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-css3-line"></i>
+</div>
+<span>CSS (styles.css)</span>
+</div>
+<div class="flex items-center space-x-2">
+<button class="copy-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-code-type="css">
+<i class="ri-clipboard-line text-gray-400"></i>
+</button>
+</div>
+</div>
+<div class="bg-gray-900 p-4 rounded-b overflow-x-auto">
+<pre class="text-gray-300 text-sm font-mono"><code>* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+body {
+font-family: 'Arial', sans-serif;
+}
+.navbar {
+display: flex;
+justify-content: space-around;
+align-items: center;
+min-height: 8vh;
+background-color: #5d4954;
+color: white;
+}
+.logo {
+text-transform: uppercase;
+letter-spacing: 5px;
+font-size: 20px;
+}
+.nav-links {
+display: flex;
+justify-content: space-around;
+width: 40%;
+}
+.nav-links li {
+list-style: none;
+}
+.nav-links a {
+color: white;
+text-decoration: none;
+letter-spacing: 3px;
+font-weight: bold;
+font-size: 14px;
+}
+.burger {
+display: none;
+cursor: pointer;
+}
+.burger div {
+width: 25px;
+height: 3px;
+background-color: white;
+margin: 5px;
+transition: all 0.3s ease;
+}
+@media screen and (max-width: 1024px) {
+.nav-links {
+width: 60%;
+}
+}
+@media screen and (max-width: 768px) {
+body {
+overflow-x: hidden;
+}
+.nav-links {
+position: absolute;
+right: 0px;
+height: 92vh;
+top: 8vh;
+background-color: #5d4954;
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 50%;
+transform: translateX(100%);
+transition: transform 0.5s ease-in;
+}
+.nav-links li {
+opacity: 0;
+}
+.burger {
+display: block;
+}
+}
+.nav-active {
+transform: translateX(0%);
+}
+@keyframes navLinkFade {
+from {
+opacity: 0;
+transform: translateX(50px);
+}
+to {
+opacity: 1;
+transform: translateX(0px);
+}
+}</code></pre>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t text-sm">
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-javascript-line"></i>
+</div>
+<span>JavaScript (script.js)</span>
+</div>
+<div class="flex items-center space-x-2">
+<button class="copy-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-code-type="js">
+<i class="ri-clipboard-line text-gray-400"></i>
+</button>
+</div>
+</div>
+<div class="bg-gray-900 p-4 rounded-b overflow-x-auto">
+<pre class="text-gray-300 text-sm font-mono"><code>const navSlide = () => {
+const burger = document.querySelector('.burger');
+const nav = document.querySelector('.nav-links');
+const navLinks = document.querySelectorAll('.nav-links li');
+burger.addEventListener('click', () => {
+// Toggle Nav
+nav.classList.toggle('nav-active');
+// Animate Links
+navLinks.forEach((link, index) => {
+if (link.style.animation) {
+link.style.animation = '';
+} else {
+link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
+}
+});
+// Burger Animation
+burger.classList.toggle('toggle');
+});
+}
+navSlide();</code></pre>
+</div>
+</div>
+<p class="text-gray-800">This creates a responsive navbar that collapses into a hamburger menu on mobile devices. The JavaScript handles the toggle functionality and animations. You can customize the colors, spacing, and animations to match your design preferences.</p>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center text-xs text-gray-500">
+<span class="mr-2">Was this helpful?</span>
+<button class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-thumb-up-line"></i>
+</button>
+<button class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-thumb-down-line"></i>
+</button>
+</div>
+<div class="flex items-center space-x-2">
+<button class="text-xs flex items-center text-gray-500 hover:text-primary !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-star-line mr-1"></i>
+Save
+</button>
+<button class="text-xs flex items-center text-gray-500 hover:text-primary !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-share-line mr-1"></i>
+Share
+</button>
+</div>
+</div>
+</div>
+<div class="mt-1 text-xs text-gray-500">Today, 10:25 AM</div>
+</div>
+</div>
+<!-- Typing Indicator -->
+<div id="typing-indicator" class="flex items-start">
+<div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-4 flex-shrink-0 text-white">
+<i class="ri-code-s-slash-line"></i>
+</div>
+<div class="flex-1">
+<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+<p class="text-gray-600 typing-animation">Thinking about your next question...</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="bg-white border-t border-gray-200 p-4">
+<div class="max-w-3xl mx-auto">
+<div class="relative">
+<textarea id="message-input" rows="3" placeholder="Ask about any programming language or code..." class="w-full pl-4 pr-20 py-3 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none text-sm"></textarea>
+<div class="absolute right-3 bottom-3 flex items-center space-x-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-attachment-2 ri-lg"></i>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-emotion-line ri-lg"></i>
+</button>
+<button id="send-message" class="w-8 h-8 flex items-center justify-center rounded-full bg-primary text-white !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-send-plane-fill ri-lg"></i>
+</button>
+</div>
+</div>
+<div class="mt-2 flex items-center justify-between text-xs text-gray-500">
+<div>
+<span class="text-green-500 mr-1">Auto-save enabled</span>
+<span>•</span>
+<span class="ml-1">Last saved 10:26 AM</span>
+</div>
+<div class="flex items-center">
+<span id="current-language" class="mr-2">JavaScript detected</span>
+<div class="w-4 h-4 flex items-center justify-center text-primary">
+<i id="language-icon" class="ri-javascript-line"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Settings Panel (Hidden by default) -->
+<aside id="settings-panel" class="w-80 bg-white border-l border-gray-200 hidden">
+<div class="p-4 border-b border-gray-200 flex items-center justify-between">
+<h3 class="font-semibold text-gray-800">Settings</h3>
+<button id="close-settings" class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-close-line ri-lg"></i>
+</button>
+</div>
+<div class="p-4 overflow-y-auto h-full">
+<div class="space-y-6">
+<div>
+<h4 class="text-sm font-medium text-gray-700 mb-3">Theme</h4>
+<div class="flex items-center space-x-3 mb-3">
+<button class="w-full py-2 bg-white border border-gray-300 rounded text-gray-800 font-medium !rounded-button whitespace-nowrap cursor-pointer">Light</button>
+<button class="w-full py-2 bg-gray-800 border border-gray-700 rounded text-white font-medium !rounded-button whitespace-nowrap cursor-pointer">Dark</button>
+<button class="w-full py-2 bg-gray-100 border border-gray-300 rounded text-gray-800 font-medium !rounded-button whitespace-nowrap cursor-pointer">System</button>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-medium text-gray-700 mb-3">Font Size</h4>
+<div class="flex items-center">
+<span class="text-xs text-gray-600 mr-2">A</span>
+<input type="range" min="12" max="20" value="14" class="flex-1">
+<span class="text-base text-gray-600 ml-2">A</span>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-medium text-gray-700 mb-3">Auto-save</h4>
+<div class="flex items-center justify-between">
+<span class="text-sm text-gray-600">Enable auto-save</span>
+<label class="switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="mt-3">
+<label class="text-sm text-gray-600 block mb-2">Auto-save interval</label>
+<select class="w-full p-2 border border-gray-300 rounded text-sm pr-8">
+<option>30 seconds</option>
+<option>1 minute</option>
+<option>5 minutes</option>
+<option>10 minutes</option>
+</select>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-medium text-gray-700 mb-3">Code Editor</h4>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-sm text-gray-600">Syntax highlighting</span>
+<label class="switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm text-gray-600">Line numbers</span>
+<label class="switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm text-gray-600">Auto-indent</span>
+<label class="switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-medium text-gray-700 mb-3">Keyboard Shortcuts</h4>
+<div class="space-y-2">
+<div class="flex items-center justify-between text-sm">
+<span class="text-gray-600">Send message</span>
+<span class="bg-gray-100 px-2 py-1 rounded text-gray-700">Ctrl + Enter</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-gray-600">New chat</span>
+<span class="bg-gray-100 px-2 py-1 rounded text-gray-700">Ctrl + N</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-gray-600">Save chat</span>
+<span class="bg-gray-100 px-2 py-1 rounded text-gray-700">Ctrl + S</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-gray-600">Clear chat</span>
+<span class="bg-gray-100 px-2 py-1 rounded text-gray-700">Ctrl + L</span>
+</div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-medium text-gray-700 mb-3">Notifications</h4>
+<div class="space-y-3">
+<label class="custom-checkbox flex items-center">
+<input type="checkbox" checked>
+<span class="checkmark mr-2"></span>
+<span class="text-sm text-gray-600">Chat completion</span>
+</label>
+<label class="custom-checkbox flex items-center">
+<input type="checkbox" checked>
+<span class="checkmark mr-2"></span>
+<span class="text-sm text-gray-600">Code execution results</span>
+</label>
+<label class="custom-checkbox flex items-center">
+<input type="checkbox">
+<span class="checkmark mr-2"></span>
+<span class="text-sm text-gray-600">System updates</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-gray-200">
+<button class="w-full py-2 bg-primary text-white rounded font-medium !rounded-button whitespace-nowrap cursor-pointer">Save Settings</button>
+</div>
+</aside>
+</main>
+<!-- Mobile Action Button -->
+<div class="md:hidden fixed right-4 bottom-20">
+<button id="new-chat" class="w-12 h-12 flex items-center justify-center bg-primary rounded-full text-white shadow-lg !rounded-button whitespace-nowrap cursor-pointer">
+<i class="ri-add-line ri-lg"></i>
+</button>
+</div>
+<!-- Success Toast for Copy -->
+<div id="copy-toast" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg transform transition-transform duration-300 translate-y-[-100px]">
+Code copied to clipboard!
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Toggle mobile menu
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const languageSidebar = document.getElementById('language-sidebar');
+function toggleSidebar() {
+languageSidebar.classList.toggle('hidden');
+languageSidebar.classList.toggle('md:block');
+}
+mobileMenuToggle.addEventListener('click', toggleSidebar);
+sidebarToggle.addEventListener('click', toggleSidebar);
+// Language selection
+const languageButtons = document.querySelectorAll('.language-btn');
+const chatTitle = document.getElementById('chat-title');
+const currentLanguage = document.getElementById('current-language');
+const languageIcon = document.getElementById('language-icon');
+languageButtons.forEach(button => {
+button.addEventListener('click', function() {
+// Remove active class from all buttons
+languageButtons.forEach(btn => {
+btn.classList.remove('bg-primary/10', 'text-primary');
+btn.classList.add('hover:bg-gray-100', 'text-gray-700');
+});
+// Add active class to clicked button
+this.classList.remove('hover:bg-gray-100', 'text-gray-700');
+this.classList.add('bg-primary/10', 'text-primary');
+// Update chat title and current language
+const language = this.getAttribute('data-language');
+chatTitle.textContent = language + ' Chat';
+currentLanguage.textContent = language + ' detected';
+// Update language icon
+const iconElement = this.querySelector('i').className;
+languageIcon.className = iconElement;
+// Clear chat messages and create new chat
+clearChat();
+});
+});
+// Send message functionality
+const messageInput = document.getElementById('message-input');
+const sendButton = document.getElementById('send-message');
+const chatMessages = document.getElementById('conversation');
+const typingIndicator = document.getElementById('typing-indicator');
+function sendMessage() {
+const message = messageInput.value.trim();
+if (message) {
+// Hide typing indicator initially
+typingIndicator.style.display = 'none';
+// Add user message
+const userMessage = createUserMessage(message);
+chatMessages.appendChild(userMessage);
+// Clear input
+messageInput.value = '';
+// Show typing indicator
+typingIndicator.style.display = 'flex';
+chatMessages.appendChild(typingIndicator);
+// Scroll to bottom
+chatMessages.scrollTop = chatMessages.scrollHeight;
+
+// Simulate AI response after a short delay
+setTimeout(() => {
+  // Hide typing indicator
+  typingIndicator.style.display = 'none';
+  // Generate AI response
+  const aiResponse = createAIResponse(message);
+  chatMessages.appendChild(aiResponse);
+  // Scroll to bottom again
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}, 1500);
+}
+}
+sendButton.addEventListener('click', sendMessage);
+messageInput.addEventListener('keydown', function(e) {
+if (e.key === 'Enter' && !e.shiftKey) {
+e.preventDefault();
+sendMessage();
+}
+});
+// Create user message element
+function createUserMessage(text) {
+const now = new Date();
+const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const messageDiv = document.createElement('div');
+messageDiv.className = 'flex items-start';
+messageDiv.innerHTML = `
+<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-4 flex-shrink-0">
+<i class="ri-user-line text-gray-600"></i>
+</div>
+<div class="flex-1">
+<div class="bg-gray-100 rounded-lg p-4">
+<p class="text-gray-800">${text}</p>
+</div>
+<div class="mt-1 text-xs text-gray-500">Today, ${timeString}</div>
+</div>
+`;
+return messageDiv;
+}
+
+// Create AI response element
+function createAIResponse(userQuery) {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  
+  // Generate appropriate response based on user query
+  let responseContent = generateResponseContent(userQuery);
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'flex items-start';
+  messageDiv.innerHTML = `
+    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-4 flex-shrink-0 text-white">
+      <i class="ri-code-s-slash-line"></i>
+    </div>
+    <div class="flex-1">
+      <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+        ${responseContent}
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center text-xs text-gray-500">
+            <span class="mr-2">Was this helpful?</span>
+            <button class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 !rounded-button whitespace-nowrap cursor-pointer">
+              <i class="ri-thumb-up-line"></i>
+            </button>
+            <button class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 !rounded-button whitespace-nowrap cursor-pointer">
+              <i class="ri-thumb-down-line"></i>
+            </button>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="text-xs flex items-center text-gray-500 hover:text-primary !rounded-button whitespace-nowrap cursor-pointer">
+              <i class="ri-star-line mr-1"></i>
+              Save
+            </button>
+            <button class="text-xs flex items-center text-gray-500 hover:text-primary !rounded-button whitespace-nowrap cursor-pointer">
+              <i class="ri-share-line mr-1"></i>
+              Share
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="mt-1 text-xs text-gray-500">Today, ${timeString}</div>
+    </div>
+  `;
+  return messageDiv;
+}
+
+// Generate response content based on user query
+function generateResponseContent(query) {
+  query = query.toLowerCase();
+  
+  // Check for common programming questions and provide appropriate responses
+  if (query.includes('javascript') || query.includes('js')) {
+    return `
+      <p class="text-gray-800 mb-4">JavaScript is a versatile programming language primarily used for web development. Here's a simple example of a JavaScript function:</p>
+      <div class="mb-4">
+        <div class="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t text-sm">
+          <div class="flex items-center">
+            <div class="w-4 h-4 flex items-center justify-center mr-2">
+              <i class="ri-javascript-line"></i>
+            </div>
+            <span>JavaScript</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="copy-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-code-type="js">
+              <i class="ri-clipboard-line text-gray-400"></i>
+            </button>
+          </div>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-b overflow-x-auto">
+          <pre class="text-gray-300 text-sm font-mono"><code>function greet(name) {
+  return \`Hello, \${name}! Welcome to JavaScript.\`;
+}
+
+// Example usage
+console.log(greet('Developer'));
+// Output: Hello, Developer! Welcome to JavaScript.</code></pre>
+        </div>
+      </div>
+      <p class="text-gray-800">JavaScript is widely used for both frontend and backend development. For frontend, it's essential for creating interactive web pages, while on the backend, Node.js allows JavaScript to run server-side.</p>
+    `;
+  } else if (query.includes('python')) {
+    return `
+      <p class="text-gray-800 mb-4">Python is a high-level, interpreted programming language known for its readability and simplicity. Here's a basic Python example:</p>
+      <div class="mb-4">
+        <div class="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t text-sm">
+          <div class="flex items-center">
+            <div class="w-4 h-4 flex items-center justify-center mr-2">
+              <i class="ri-python-line"></i>
+            </div>
+            <span>Python</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="copy-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-code-type="python">
+              <i class="ri-clipboard-line text-gray-400"></i>
+            </button>
+          </div>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-b overflow-x-auto">
+          <pre class="text-gray-300 text-sm font-mono"><code>def greet(name):
+    return f"Hello, {name}! Welcome to Python."
+
+# Example usage
+print(greet("Developer"))
+# Output: Hello, Developer! Welcome to Python.</code></pre>
+        </div>
+      </div>
+      <p class="text-gray-800">Python is widely used in data science, machine learning, web development, automation, and many other fields due to its versatility and extensive library ecosystem.</p>
+    `;
+  } else if (query.includes('html') || query.includes('css')) {
+    return `
+      <p class="text-gray-800 mb-4">HTML and CSS are the building blocks of web pages. HTML provides the structure, while CSS handles the styling. Here's a simple example:</p>
+      <div class="mb-4">
+        <div class="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t text-sm">
+          <div class="flex items-center">
+            <div class="w-4 h-4 flex items-center justify-center mr-2">
+              <i class="ri-html5-line"></i>
+            </div>
+            <span>HTML</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="copy-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-code-type="html">
+              <i class="ri-clipboard-line text-gray-400"></i>
+            </button>
+          </div>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-b overflow-x-auto">
+          <pre class="text-gray-300 text-sm font-mono"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;My Web Page&lt;/title&gt;
+  &lt;style&gt;
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      color: #6366f1;
+    }
+    .card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="container"&gt;
+    &lt;h1&gt;Welcome to My Web Page&lt;/h1&gt;
+    &lt;div class="card"&gt;
+      &lt;p&gt;This is a simple example of HTML and CSS working together.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        </div>
+      </div>
+      <p class="text-gray-800">HTML provides the structure of web pages, while CSS allows you to style and layout the content. Together, they form the foundation of web development.</p>
+    `;
+  } else if (query.includes('react')) {
+    return `
+      <p class="text-gray-800 mb-4">React is a popular JavaScript library for building user interfaces, particularly single-page applications. Here's a simple React component example:</p>
+      <div class="mb-4">
+        <div class="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t text-sm">
+          <div class="flex items-center">
+            <div class="w-4 h-4 flex items-center justify-center mr-2">
+              <i class="ri-reactjs-line"></i>
+            </div>
+            <span>React</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="copy-btn w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 !rounded-button whitespace-nowrap cursor-pointer" data-code-type="jsx">
+              <i class="ri-clipboard-line text-gray-400"></i>
+            </button>
+          </div>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-b overflow-x-auto">
+          <pre class="text-gray-300 text-sm font-mono"><code>import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    &lt;div className="counter"&gt;
+      &lt;h2&gt;Counter: {count}&lt;/h2&gt;
+      &lt;button onClick={() => setCount(count + 1)}&gt;
+        Increment
+      &lt;/button&gt;
+      &lt;button onClick={() => setCount(count - 1)}&gt;
+        Decrement
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default Counter;</code></pre>
+        </div>
+      </div>
+      <p class="text-gray-800">React uses a component-based architecture that allows you to build reusable UI elements. It efficiently updates and renders components when your data changes using its virtual DOM implementation.</p>
+    `;
+  } else {
+    // Default response for other queries
+    return `
+      <p class="text-gray-800 mb-4">I understand you're asking about "${query}". Here's some information that might help:</p>
+      <p class="text-gray-800 mb-4">Programming is the process of creating a set of instructions that tell a computer how to perform a task. Programming can be done using a variety of computer programming languages, such as JavaScript, Python, and C++.</p>
+      <p class="text-gray-800">If you have a specific programming question or need help with a particular language or concept, please provide more details, and I'll be happy to assist you further.</p>
+    `;
+  }
+}
+// Clear chat functionality
+const clearChatButton = document.getElementById('clear-chat');
+function clearChat() {
+// Clear all messages except the welcome message
+const welcomeMessage = document.querySelector('.max-w-3xl.mx-auto.mb-8');
+chatMessages.innerHTML = '';
+chatMessages.appendChild(welcomeMessage);
+}
+clearChatButton.addEventListener('click', clearChat);
+// New chat button
+const newChatButton = document.getElementById('new-chat');
+newChatButton.addEventListener('click', function() {
+clearChat();
+chatTitle.textContent = 'New Chat';
+});
+// Copy code functionality
+const copyToast = document.getElementById('copy-toast');
+
+// Initial setup for existing copy buttons
+const copyButtons = document.querySelectorAll('.copy-btn');
+copyButtons.forEach(button => {
+  button.addEventListener('click', handleCopyClick);
+});
+
+// Function to handle copy button clicks
+function handleCopyClick() {
+  const codeType = this.getAttribute('data-code-type');
+  const codeBlock = this.closest('.mb-4').querySelector('code').textContent;
+  navigator.clipboard.writeText(codeBlock).then(() => {
+    // Show toast
+    copyToast.style.transform = 'translateY(0)';
+    // Hide toast after 2 seconds
+    setTimeout(() => {
+      copyToast.style.transform = 'translateY(-100px)';
+    }, 2000);
+  });
+}
+
+// Function to set up new copy buttons that are dynamically added
+function setupNewCopyButtons() {
+  document.querySelectorAll('.copy-btn:not([data-initialized])').forEach(button => {
+    button.setAttribute('data-initialized', 'true');
+    button.addEventListener('click', handleCopyClick);
+  });
+}
+
+// Observer to watch for DOM changes and set up new buttons
+const observer = new MutationObserver(mutations => {
+  setupNewCopyButtons();
+});
+
+// Start observing the chat messages container
+observer.observe(document.getElementById('conversation'), {
+  childList: true,
+  subtree: true
+});
+// Custom checkbox functionality
+const checkboxes = document.querySelectorAll('.custom-checkbox input');
+checkboxes.forEach(checkbox => {
+checkbox.addEventListener('change', function() {
+// Custom checkbox logic if needed
+});
+});
+// Range slider functionality
+const rangeSlider = document.querySelector('input[type="range"]');
+if (rangeSlider) {
+rangeSlider.addEventListener('input', function() {
+// Update font size based on slider value
+// document.documentElement.style.fontSize = this.value + 'px';
+});
+}
+// Settings panel toggle
+const settingsButton = document.querySelector('.w-5.h-5.flex.items-center.justify-center.mr-2 i.ri-settings-3-line').parentElement.parentElement;
+const settingsPanel = document.getElementById('settings-panel');
+const closeSettings = document.getElementById('close-settings');
+settingsButton.addEventListener('click', function() {
+settingsPanel.classList.toggle('hidden');
+});
+closeSettings.addEventListener('click', function() {
+settingsPanel.classList.add('hidden');
+});
+});
+</script>
+</body>
+</html>
